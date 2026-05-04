@@ -1,0 +1,38 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  messages  Message[]
+  chats     Chat[]   @relation("UserChats")
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  name      String?   // для групповых чатов
+  isGroup   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  users     User[]   @relation("UserChats")
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  text      String
+  userId    String
+  chatId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  chat      Chat     @relation(fields: [chatId], references: [id])
+}
