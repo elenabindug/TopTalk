@@ -1,19 +1,16 @@
-import Login from './components/Login';
+import Login from './components/Login';  
+import Chat from './components/Chat';
 import useAuthStore from './store/useAuthStore.mock';
 
 function App() {
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   if (!user) {
     return <Login />;
   }
 
-  return (
-    <div>
-      <h1>Добро пожаловать, {user.name}!</h1>
-      <p>Здесь будет чат</p>
-    </div>
-  );
+ return <Chat />;
 }
 
 export default App;

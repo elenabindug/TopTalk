@@ -1,19 +1,16 @@
 import { useState } from 'react';
-import { login } from '../api/auth';
-import useAuthStore from '../store/useAuthStore';
+import useAuthStore from '../store/useAuthStore.mock';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const setUser = useAuthStore((state) => state.setUser);
+  const login = useAuthStore((state) => state.login);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(email, password);
-      localStorage.setItem('token', res.data.token);
-      setUser(res.data.user);
-      alert('Успешный вход (заглушка)');
+      await login(email, password);
+      // после логина стора сама обновит user, редирект сделает App.jsx
     } catch (err) {
       console.error(err);
     }
