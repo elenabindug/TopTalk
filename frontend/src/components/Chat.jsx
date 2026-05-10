@@ -1,5 +1,8 @@
 import useAuthStore from '../store/useAuthStore.mock';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getChats } from '../api/chats';
+import { sendMessage } from '../api/messages';
+
 
 function Chat() {
   const user = useAuthStore((state) => state.user);
@@ -27,11 +30,20 @@ function sendMessages(){
         chatId: activeChatId,
         createdAt: new Date().toISOString()
 };
+    sendMessage(activeChatId, trimmedText).then(res => {
+      console.log('Результат отправки (заглушка):', res.data);
+});
     setMessages(prevMessages => [...prevMessages, newMessage]);
     setInputText('');
 }
 
 console.log('Все сообщения:', messages);
+
+useEffect(() => {
+  getChats().then(res => {
+    console.log('Чаты с сервера (заглушка):', res.data);
+  });
+}, []);
 
   return (
   <div style={{ display: 'flex', height: '100vh' }}>
