@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-// import api from '../api/axios';  // закомментируй
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -25,6 +24,8 @@ const useAuthStore = create((set) => ({
     localStorage.removeItem('token');
     set({ user: null, token: null });
   },
+
+  setUser: (user) => set({ user }),
 }));
 
 export default useAuthStore;
