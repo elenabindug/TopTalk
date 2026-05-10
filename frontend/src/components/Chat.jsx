@@ -2,9 +2,10 @@ import useAuthStore from '../store/useAuthStore.mock';
 import { useState, useEffect } from 'react';
 import { getChats } from '../api/chats';
 import { sendMessage } from '../api/messages';
-
+import { useNavigate } from 'react-router-dom';
 
 function Chat() {
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [chat] = useState([
@@ -65,7 +66,10 @@ useEffect(() => {
           {chat.name}
         </div>
       ))}
-      <button onClick={logout} style={{ marginTop: '20px' }}>Выйти</button>
+       <button onClick={() => {
+              logout();
+              navigate('/login');
+              }}>Выйти</button>
     </div>
 
     {/* ПРАВАЯ КОЛОНКА — ОКНО ЧАТА */}
@@ -95,7 +99,6 @@ useEffect(() => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
         />
-            <button onClick={sendMessages}>Отправить</button>
         </div>
         </>
       )}

@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import useAuthStore from '../store/useAuthStore.mock';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((state) => state.login);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-      // после логина стора сама обновит user, редирект сделает App.jsx
-    } catch (err) {
-      console.error(err);
-    }
+    await login(email, password);
+    navigate('/chat');   
   };
 
   return (
