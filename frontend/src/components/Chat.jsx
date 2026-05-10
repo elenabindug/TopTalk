@@ -98,8 +98,9 @@ useEffect(() => {
             placeholder="Введите сообщение..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-        />
-        </div>
+            />
+            <button onClick={sendMessages}>Отправить</button>
+</div>
         </>
       )}
     </div>
