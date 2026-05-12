@@ -1,12 +1,14 @@
-import useAuthStore from '../store/useAuthStore.mock';
+import useAuthStore from '../store/useAuthStore';
 import { useState, useEffect } from 'react';
 import { getChats } from '../api/chats';
 import { sendMessage } from '../api/messages';
 import { useNavigate } from 'react-router-dom';
+import useSocket from '../hooks/useSocket';
 
 function Chat() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const token = user?.token;
   const logout = useAuthStore((state) => state.logout);
   const [chat] = useState([
     {id: 1, name: "Общий чат"},
@@ -15,6 +17,7 @@ function Chat() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([]);
+  const socket = useSocket(token);
 
 function sendMessages(){
     console.log('Функция sendMessages вызвана');
@@ -32,6 +35,12 @@ function sendMessages(){
         createdAt: new Date().toISOString()
 };
     sendMessage(activeChatId, trimmedText).then(res => {
+      if (socket) {
+  socket.emit('send-message', {
+    chatId: activeChatId,
+    text: trimmedText,
+  });
+}
       console.log('Результат отправки (заглушка):', res.data);
 });
     setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -44,7 +53,18 @@ useEffect(() => {
   getChats().then(res => {
     console.log('Чаты с сервера (заглушка):', res.data);
   });
-}, []);
+
+  if (socket) {
+    const handleNewMessage = (newMessage) => {
+      console.log('Новое сообщение через сокет:', newMessage);
+      setMessages(prev => [...prev, newMessage]);
+    };
+    socket.on('receive-message', handleNewMessage);
+    return () => {
+      socket.off('receive-message', handleNewMessage);
+    };
+  }
+}, [socket]);
 
   return (
   <div style={{ display: 'flex', height: '100vh' }}>

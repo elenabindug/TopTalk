@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useAuthStore from '../store/useAuthStore.mock';
+import useAuthStore from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
