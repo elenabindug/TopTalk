@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ Неделя 1 | Профили с аватарами</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .homework-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .task-description {
+            background: #e8f4f8;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .task-description code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .profiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: #667eea;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .profile-job {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            color: #888;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .flex-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .info-message {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2c5282;
+        }
+    </style>
+</head>
+<body>
+    <div class="homework-container">
+        <h1>Домашнее задание | Неделя 1</h1>
+        
+        <div class="task-description">
+            <strong>Задача:</strong> Создать страницу с профилями сотрудников.<br><br>
+            
+            <strong>Что нужно сделать в script.js:</strong><br>
+            1. Создать массив <code>employees</code> из 4 объектов. У каждого объекта есть свойства: <code>name</code> (имя), <code>job</code> (должность), <code>email</code> (почта), <code>avatarLetter</code> (буква для аватара).<br>
+            2. Написать функцию <code>renderProfiles(data)</code>, которая очищает контейнер и создаёт карточки для всех сотрудников.<br>
+            3. При загрузке страницы отобразить всех сотрудников.<br>
+            4. Реализовать кнопку "Отсортировать по имени" — при клике сотрудники сортируются в алфавитном порядке и страница обновляется.<br>
+            5. Реализовать кнопку "Показать только первых двух" — при клике показываются только первые 2 сотрудника из МАССИВА (не удаляя остальных данных).<br>
+            6. Реализовать кнопку "Сбросить" — показать всех сотрудников снова.<br>
+            <br>
+            <strong>Важно:</strong> HTML и CSS менять нельзя. Работаем только в <code>script.js</code>.
+        </div>
+
+        <div class="profiles-container" id="profilesContainer">
+            <div class="info-message">Загрузка профилей... (ожидаем JavaScript)</div>
+        </div>
+
+        <div class="flex-buttons">
+            <button id="sortButton">Отсортировать по имени</button>
+            <button id="limitButton">Показать первых двух</button>
+            <button id="resetButton">Сбросить</button>
+        </div>
+    </div>
+
+    <script src="homework-script.js"></script>
+</body>
+</html>

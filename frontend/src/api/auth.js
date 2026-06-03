@@ -1,29 +1,16 @@
+import api from './axios';
+
 export const register = async (email, name, password) => {
-  console.log('Заглушка регистрации:', { email, name, password });
-  return {
-    data: {
-      token: 'fake-jwt-token',
-      user: { id: 1, name, email }
-    }
-  };
+    const response = await api.post('/auth/register', { email, name, password });
+    return response.data;
 };
 
 export const login = async (email, password) => {
-  console.log('Заглушка логина:', { email, password });
-  return {
-    data: {
-      token: 'fake-jwt-token',
-      user: { id: 1, name: 'Анна', email }
-    }
-  };
+    const response = await api.post('/auth/login', { email, password });
+    return response.data;
 };
 
 export const getChats = async () => {
-  console.log('Заглушка списка чатов');
-  return {
-    data: [
-      { id: 1, name: 'Общий чат', isGroup: true },
-      { id: 2, name: 'С Ваней', isGroup: false }
-    ]
-  };
+    const response = await api.get('/chats');
+    return response.data; // предполагаем, что бэк возвращает { chats: [...] }
 };
