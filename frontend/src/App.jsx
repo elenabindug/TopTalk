@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 import Chat from "./components/Chat";
+import ChangePasswordStep1 from './components/ChangePasswordStep1';
+import ChangePasswordStep2 from './components/ChangePasswordStep2';
+
+// Внутри <Routes>:
+<Route path="/change-password" element={<ChangePasswordStep1 />} />
+<Route path="/change-password/step2" element={<ChangePasswordStep2 />} />
 
 function App() {
   const [view, setView] = useState('login');
