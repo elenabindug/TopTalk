@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Chat from "./components/Chat";
 import ChangePasswordStep1 from './components/ChangePasswordStep1';
 import ChangePasswordStep2 from './components/ChangePasswordStep2';
-
-// Внутри <Routes>:
-<Route path="/change-password" element={<ChangePasswordStep1 />} />
-<Route path="/change-password/step2" element={<ChangePasswordStep2 />} />
 
 function App() {
   const [view, setView] = useState('login');
@@ -23,14 +20,9 @@ function App() {
       return;
     }
     console.log('Логин:', login, 'Пароль:', password);
-    // Здесь позже будет вызов API
     setIsAuthenticated(true);
   };
 
-  // Передаём setIsAuthenticated в Chat
-if (isAuthenticated) {
-  return <Chat onLogout={() => setIsAuthenticated(false)} />;
-}
   // Обработчик восстановления (шаг 1)
   const handleRecoverySubmit = (e) => {
     e.preventDefault();
@@ -52,14 +44,13 @@ if (isAuthenticated) {
 
   // Если авторизован — показываем чат
   if (isAuthenticated) {
-    return <Chat userName={login} />;
+    return <Chat onLogout={() => setIsAuthenticated(false)} />;
   }
 
-  // Страницы авторизации
+  // Страницы авторизации (без роутинга, просто переключение view)
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Логотип */}
         <div className="logo-container">
           <span className="logo-text">
             TopTalk<span className="logo-corner"></span>
