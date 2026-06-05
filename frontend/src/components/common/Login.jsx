@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import useAuthStore from '../store/useAuthStore';
+import useAuthStore from '../../store/useAuthStore';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -56,9 +56,8 @@ function Login() {
 
           <button type="submit" className="btn-primary">Войти</button>
 
-          <div className="auth-links">
+          <div className="auth-links" style={{ justifyContent: 'center' }}>
             <Link to="/forgot-password" className="btn-link">Забыли пароль?</Link>
-            <Link to="/register" className="btn-link">Регистрация</Link>
           </div>
         </form>
       </div>
