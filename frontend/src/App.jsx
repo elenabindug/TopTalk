@@ -3,6 +3,8 @@ import './App.css';
 // Общие компоненты
 import ChangePasswordStep1 from "./components/common/ChangePasswordStep1";
 import ChangePasswordStep2 from "./components/common/ChangePasswordStep2";
+import ForgotPassword from "./components/common/ForgotPassword";
+import ForgotPasswordStep2 from "./components/common/ForgotPasswordStep2";
 // Студенческие компоненты
 import StudentChat from "./components/student/StudentChat";
 // Админские компоненты
@@ -11,6 +13,7 @@ import AdminChat from "./components/admin/AdminChat";
 function App() {
   const [view, setView] = useState('login');
   const [changePasswordStep, setChangePasswordStep] = useState(null);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState(null);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -63,22 +66,15 @@ function App() {
     }
   };
 
-  const handleRecoverySubmit = (e) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      alert('Введите email');
-      return;
-    }
-    setView('success');
-  };
-
   const goToLogin = () => {
     setView('login');
     setLogin('');
     setPassword('');
     setEmail('');
+    setForgotPasswordStep(null);
   };
 
+  // Обработчики смены пароля (для авторизованных пользователей)
   const handleChangePasswordStart = () => setChangePasswordStep('step1');
   const handleEmailSent = () => setChangePasswordStep('step2');
   const handleChangePasswordComplete = () => {
@@ -86,6 +82,23 @@ function App() {
     alert('Пароль успешно изменён!');
   };
   const handleBackFromChangePassword = () => setChangePasswordStep(null);
+
+  // Обработчики восстановления пароля (для неавторизованных)
+  const handleForgotPasswordStart = () => {
+    setForgotPasswordStep('step1');
+  };
+  const handleForgotPasswordEmailSent = () => {
+    setForgotPasswordStep('step2');
+  };
+  const handleForgotPasswordComplete = () => {
+    setForgotPasswordStep(null);
+    setView('login');
+    alert('Пароль успешно восстановлен! Войдите с новым паролем.');
+  };
+  const handleBackFromForgotPassword = () => {
+    setForgotPasswordStep(null);
+    setView('login');
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -95,7 +108,7 @@ function App() {
     setChangePasswordStep(null);
   };
 
-  // ========== СМЕНА ПАРОЛЯ ==========
+  // ========== СМЕНА ПАРОЛЯ (для авторизованных) ==========
   if (isAuthenticated && changePasswordStep === 'step1') {
     return <ChangePasswordStep1 
       onBack={handleBackFromChangePassword}
@@ -108,6 +121,21 @@ function App() {
     return <ChangePasswordStep2 
       onBack={() => setChangePasswordStep('step1')}
       onComplete={handleChangePasswordComplete}
+    />;
+  }
+
+  // ========== ВОССТАНОВЛЕНИЕ ПАРОЛЯ (для неавторизованных) ==========
+  if (forgotPasswordStep === 'step1') {
+    return <ForgotPassword 
+      onBack={handleBackFromForgotPassword}
+      onEmailSent={handleForgotPasswordEmailSent}
+    />;
+  }
+
+  if (forgotPasswordStep === 'step2') {
+    return <ForgotPasswordStep2 
+      onBack={() => setForgotPasswordStep('step1')}
+      onComplete={handleForgotPasswordComplete}
     />;
   }
 
@@ -179,47 +207,11 @@ function App() {
             <button type="submit" className="btn-primary">Войти</button>
             
             <div className="auth-links">
-              <button type="button" className="btn-link" onClick={() => setView('recovery')}>
+              <button type="button" className="btn-link" onClick={handleForgotPasswordStart}>
                 Забыли пароль?
               </button>
             </div>
           </form>
-        )}
-
-        {view === 'recovery' && (
-          <form onSubmit={handleRecoverySubmit} className="auth-form">
-            <h2 className="auth-subtitle">Восстановление пароля</h2>
-            
-            <div className="input-group">
-              <label>Ваш email</label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn-primary">Далее</button>
-            
-            <button type="button" className="btn-link" onClick={goToLogin}>
-              На страницу входа
-            </button>
-          </form>
-        )}
-
-        {view === 'success' && (
-          <div className="auth-form">
-            <h2 className="auth-subtitle">Восстановление пароля</h2>
-            
-            <div className="info-box">
-              На вашу почту отправлена инструкция по восстановлению пароля.
-            </div>
-            
-            <button type="button" className="btn-link" onClick={goToLogin}>
-              На страницу входа
-            </button>
-          </div>
         )}
       </div>
     </div>

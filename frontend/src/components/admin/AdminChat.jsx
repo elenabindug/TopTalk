@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import AdminAnnouncements from './AdminAnnouncements';
 import AdminProfile from './AdminProfile';
 import GroupStats from './GroupStats';
+import ChangePasswordStep1 from '../common/ChangePasswordStep1';
+import ChangePasswordStep2 from '../common/ChangePasswordStep2';
 import './AdminChat.css';
 
 // Иконки SVG
@@ -61,7 +63,7 @@ const CreateGroupIcon = () => (
   </svg>
 );
 
-function AdminChat({ onLogout, onChangePassword }) {
+function AdminChat({ onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -73,6 +75,8 @@ function AdminChat({ onLogout, onChangePassword }) {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [changePasswordStep, setChangePasswordStep] = useState(null);
   
   const [userData, setUserData] = useState({
     name: 'Администратор',
@@ -99,6 +103,29 @@ function AdminChat({ onLogout, onChangePassword }) {
 
   const menuRef = useRef(null);
   const menuBtnRef = useRef(null);
+
+  const addEmoji = (emoji) => {
+    setInputText(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Обработчики смены пароля
+  const handleChangePasswordStart = () => {
+    setChangePasswordStep('step1');
+  };
+
+  const handleEmailSent = () => {
+    setChangePasswordStep('step2');
+  };
+
+  const handleChangePasswordComplete = () => {
+    setChangePasswordStep(null);
+    alert('Пароль успешно изменён!');
+  };
+
+  const handleBackFromChangePassword = () => {
+    setChangePasswordStep(null);
+  };
 
   useEffect(() => {
     const savedGroups = localStorage.getItem('groups');
@@ -326,13 +353,33 @@ function AdminChat({ onLogout, onChangePassword }) {
 
   const iconOptions = ['👥', '💻', '🎨', '📱', '📊', '🎓', '🏆', '⭐', '🔥', '💡'];
 
+  // ========== РАННИЕ RETURN ==========
+  if (changePasswordStep === 'step1') {
+    return <ChangePasswordStep1 
+      onBack={handleBackFromChangePassword}
+      onLogout={onLogout}
+      onEmailSent={handleEmailSent}
+    />;
+  }
+
+  if (changePasswordStep === 'step2') {
+    return <ChangePasswordStep2 
+      onBack={() => setChangePasswordStep('step1')}
+      onComplete={handleChangePasswordComplete}
+    />;
+  }
+
   if (showAnnouncements) {
     return <AdminAnnouncements onBack={() => setShowAnnouncements(false)} />;
   }
 
   if (showProfile) {
     return <AdminProfile 
-      onBack={() => setShowProfile(false)} 
+      onBack={() => setShowProfile(false)}
+      onChangePassword={() => {
+        setShowProfile(false);
+        handleChangePasswordStart();
+      }}
       userData={userData}
       setUserData={setUserData}
     />;
@@ -427,10 +474,6 @@ function AdminChat({ onLogout, onChangePassword }) {
               <button className="floating-menu-item" onClick={handleCreateGroup}>
                 <span className="menu-icon">👥</span>
                 Создать группу
-              </button>
-              <button className="floating-menu-item" onClick={onChangePassword}>
-                <span className="menu-icon">🔒</span>
-                Сменить пароль
               </button>
               <button className="floating-menu-item logout" onClick={onLogout}>
                 <span className="menu-icon">🚪</span>
@@ -654,6 +697,13 @@ function AdminChat({ onLogout, onChangePassword }) {
               )}
             </div>
             <div className="chat-input-container">
+              <button className="emoji-btn" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                😊
+              </button>
+              <label className="file-btn">
+                📎
+                <input type="file" hidden />
+              </label>
               <input
                 type="text"
                 className="chat-input"
@@ -666,6 +716,16 @@ function AdminChat({ onLogout, onChangePassword }) {
                 Отправить
               </button>
             </div>
+            {showEmojiPicker && (
+              <div className="emoji-picker">
+                <button onClick={() => addEmoji('😊')}>😊</button>
+                <button onClick={() => addEmoji('😂')}>😂</button>
+                <button onClick={() => addEmoji('❤️')}>❤️</button>
+                <button onClick={() => addEmoji('👍')}>👍</button>
+                <button onClick={() => addEmoji('🔥')}>🔥</button>
+                <button onClick={() => addEmoji('🎉')}>🎉</button>
+              </div>
+            )}
           </>
         )}
       </main>
