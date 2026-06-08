@@ -387,3 +387,53 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #4a1f96;
 }
+
+/* Кнопки смайликов и файлов */
+.emoji-btn, .file-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-btn:hover, .file-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Панель выбора смайликов */
+.emoji-picker {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  background: #1F1F22;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 280px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2C2C30;
+}
+
+.emoji-picker button {
+  background: #2C2C30;
+  border: none;
+  font-size: 24px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.emoji-picker button:hover {
+  transform: scale(1.1);
+  background: #3C3C40;
+}

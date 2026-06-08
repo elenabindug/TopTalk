@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import StudentAnnouncements from './StudentAnnouncements';
+import StudentProfile from './StudentProfile';
+import ChangePasswordStep1 from '../common/ChangePasswordStep1';
+import ChangePasswordStep2 from '../common/ChangePasswordStep2';
 import './StudentChat.css';
 
 // Иконки SVG
@@ -19,20 +22,6 @@ const InfoIcon = () => (
   </svg>
 );
 
-const SettingsIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="4" y1="21" x2="4" y2="14"></line>
-    <line x1="4" y1="10" x2="4" y2="3"></line>
-    <line x1="12" y1="21" x2="12" y2="12"></line>
-    <line x1="12" y1="8" x2="12" y2="3"></line>
-    <line x1="20" y1="21" x2="20" y2="16"></line>
-    <line x1="20" y1="12" x2="20" y2="3"></line>
-    <line x1="1" y1="14" x2="7" y2="14"></line>
-    <line x1="9" y1="8" x2="15" y2="8"></line>
-    <line x1="17" y1="16" x2="23" y2="16"></line>
-  </svg>
-);
-
 const LogoutIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -41,12 +30,21 @@ const LogoutIcon = () => (
   </svg>
 );
 
-function StudentChat({ onLogout, onChangePassword }) {
+function StudentChat({ onLogout }) {
+  // ========== ВСЕ ХУКИ В НАЧАЛЕ ==========
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [changePasswordStep, setChangePasswordStep] = useState(null);
   const [activeChatId, setActiveChatId] = useState(null);
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [userData, setUserData] = useState({
+    name: 'Студент',
+    bio: 'Люблю программирование и дизайн',
+    avatar: ''
+  });
   const [chats] = useState([
     { id: 1, name: "Общий чат", avatar: "👥" },
     { id: 2, name: "С Леной", avatar: "👤" },
@@ -55,6 +53,29 @@ function StudentChat({ onLogout, onChangePassword }) {
 
   const menuRef = useRef(null);
   const menuBtnRef = useRef(null);
+
+  // ========== ВСЕ useEffect И ФУНКЦИИ ==========
+  const addEmoji = (emoji) => {
+    setInputText(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const handleChangePasswordStart = () => {
+    setChangePasswordStep('step1');
+  };
+
+  const handleEmailSent = () => {
+    setChangePasswordStep('step2');
+  };
+
+  const handleChangePasswordComplete = () => {
+    setChangePasswordStep(null);
+    alert('Пароль успешно изменён!');
+  };
+
+  const handleBackFromChangePassword = () => {
+    setChangePasswordStep(null);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -131,13 +152,42 @@ function StudentChat({ onLogout, onChangePassword }) {
     setInputText('');
   };
 
+  const filteredMessages = messages.filter(msg => msg.chatId === activeChatId);
+  const activeChat = chats.find(c => c.id === activeChatId);
+
+  // ========== РАННИЕ RETURN ==========
+  if (changePasswordStep === 'step1') {
+    return <ChangePasswordStep1 
+      onBack={handleBackFromChangePassword}
+      onLogout={onLogout}
+      onEmailSent={handleEmailSent}
+    />;
+  }
+
+  if (changePasswordStep === 'step2') {
+    return <ChangePasswordStep2 
+      onBack={() => setChangePasswordStep('step1')}
+      onComplete={handleChangePasswordComplete}
+    />;
+  }
+
   if (showAnnouncements) {
     return <StudentAnnouncements onBack={() => setShowAnnouncements(false)} />;
   }
 
-  const filteredMessages = messages.filter(msg => msg.chatId === activeChatId);
-  const activeChat = chats.find(c => c.id === activeChatId);
+  if (showProfile) {
+    return <StudentProfile 
+      onBack={() => setShowProfile(false)}
+      onChangePassword={() => {
+        setShowProfile(false);
+        handleChangePasswordStart();
+      }}
+      userData={userData}
+      setUserData={setUserData}
+    />;
+  }
 
+  // ========== ОСНОВНОЙ RETURN ==========
   return (
     <div className="student-chat-container">
       <div className="student-chat-sidebar">
@@ -181,13 +231,13 @@ function StudentChat({ onLogout, onChangePassword }) {
               </div>
             </div>
             <nav className="floating-menu-nav">
+              <button className="floating-menu-item" onClick={() => setShowProfile(true)}>
+                <span className="menu-icon">👤</span>
+                Мой профиль
+              </button>
               <button className="floating-menu-item" onClick={() => setShowAnnouncements(true)}>
                 <span className="menu-icon">📢</span>
                 Объявления
-              </button>
-              <button className="floating-menu-item" onClick={onChangePassword}>
-                <span className="menu-icon">🔒</span>
-                Сменить пароль
               </button>
               <button className="floating-menu-item logout" onClick={onLogout}>
                 <span className="menu-icon">🚪</span>
@@ -225,6 +275,13 @@ function StudentChat({ onLogout, onChangePassword }) {
               )}
             </div>
             <div className="chat-input-container">
+              <button className="emoji-btn" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                😊
+              </button>
+              <label className="file-btn">
+                📎
+                <input type="file" hidden />
+              </label>
               <input
                 type="text"
                 className="chat-input"
@@ -237,6 +294,16 @@ function StudentChat({ onLogout, onChangePassword }) {
                 Отправить
               </button>
             </div>
+            {showEmojiPicker && (
+              <div className="emoji-picker">
+                <button onClick={() => addEmoji('😊')}>😊</button>
+                <button onClick={() => addEmoji('😂')}>😂</button>
+                <button onClick={() => addEmoji('❤️')}>❤️</button>
+                <button onClick={() => addEmoji('👍')}>👍</button>
+                <button onClick={() => addEmoji('🔥')}>🔥</button>
+                <button onClick={() => addEmoji('🎉')}>🎉</button>
+              </div>
+            )}
           </>
         )}
       </main>

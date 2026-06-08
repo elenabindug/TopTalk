@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function ForgotPassword() {
+function ForgotPassword({ onBack, onEmailSent }) {
   const [email, setEmail] = useState('');
   const [isSent, setIsSent] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,7 +12,9 @@ function ForgotPassword() {
     }
     setIsSent(true);
     setTimeout(() => {
-      navigate('/login');
+      if (onEmailSent) {
+        onEmailSent();
+      }
     }, 3000);
   };
 
@@ -28,9 +28,11 @@ function ForgotPassword() {
           <div className="auth-form">
             <h2 className="auth-subtitle">Восстановление пароля</h2>
             <div className="info-box">
-              На вашу почту отправлена инструкция по восстановлению пароля к аккаунту.
+              На вашу почту отправлена инструкция по восстановлению пароля.
             </div>
-            <button className="btn-link" onClick={() => navigate('/login')}>На страницу входа</button>
+            <button className="btn-link" onClick={onBack}>
+              На страницу входа
+            </button>
           </div>
         </div>
       </div>
@@ -50,7 +52,9 @@ function ForgotPassword() {
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <button type="submit" className="btn-primary">Отправить</button>
-          <button type="button" className="btn-link" onClick={() => navigate('/login')}>На страницу входа</button>
+          <button type="button" className="btn-link" onClick={onBack}>
+            На страницу входа
+          </button>
         </form>
       </div>
     </div>

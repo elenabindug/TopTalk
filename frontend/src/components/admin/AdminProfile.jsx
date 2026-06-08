@@ -15,7 +15,7 @@ const EditIcon = () => (
   </svg>
 );
 
-function AdminProfile({ onBack, userData, setUserData }) {
+function AdminProfile({ onBack, onChangePassword, userData, setUserData }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(userData.name);
   const [tempBio, setTempBio] = useState(userData.bio);
@@ -82,6 +82,12 @@ function AdminProfile({ onBack, userData, setUserData }) {
             </button>
           </>
         )}
+
+        <div className="admin-profile-buttons">
+          <button className="admin-profile-action-btn" onClick={onChangePassword}>
+            Сменить пароль
+          </button>
+        </div>
       </div>
     </div>
   );

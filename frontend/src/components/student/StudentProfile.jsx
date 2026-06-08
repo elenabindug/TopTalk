@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './ProfileScreen.css';
+import './StudentProfile.css';
 
 const BackIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -15,74 +15,70 @@ const EditIcon = () => (
   </svg>
 );
 
-function ProfileScreen({ onBack, onChangePassword, userData, setUserData }) {
-  const [isEditingBio, setIsEditingBio] = useState(false);
+function StudentProfile({ onBack, onChangePassword, userData, setUserData }) {
+  const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState(userData.bio);
   const [avatar, setAvatar] = useState(userData.avatar);
 
   const handleAvatarChange = () => {
     const newAvatar = prompt('Введите URL новой аватарки:', avatar);
-    if (newAvatar) {
-      setAvatar(newAvatar);
-      setUserData({ ...userData, avatar: newAvatar });
-    }
+    if (newAvatar) setAvatar(newAvatar);
   };
 
-  const saveBio = () => {
-    setUserData({ ...userData, bio: tempBio });
-    setIsEditingBio(false);
+  const handleSave = () => {
+    setUserData({ ...userData, bio: tempBio, avatar: avatar });
+    setIsEditing(false);
   };
 
   return (
-    <div className="profile-screen">
-      <div className="profile-header">
-        <button className="profile-back-btn" onClick={onBack}>
+    <div className="student-profile-container">
+      <div className="student-profile-header">
+        <button className="student-profile-back-btn" onClick={onBack}>
           <BackIcon /> Назад
         </button>
-        <h1>Профиль</h1>
+        <h1>Профиль студента</h1>
       </div>
 
-      <div className="profile-card">
-        <div className="profile-avatar-container">
-          <div className="profile-avatar" style={{ backgroundImage: `url(${avatar})` }}>
-            {!avatar && <span className="avatar-placeholder">{userData.name?.[0] || 'А'}</span>}
+      <div className="student-profile-card">
+        <div className="student-profile-avatar-container">
+          <div className="student-profile-avatar" style={{ backgroundImage: `url(${avatar})` }}>
+            {!avatar && <span className="avatar-placeholder">{userData.name?.[0] || 'С'}</span>}
           </div>
-          <button className="profile-avatar-edit" onClick={handleAvatarChange}>
+          <button className="student-profile-avatar-edit" onClick={handleAvatarChange}>
             <EditIcon />
           </button>
         </div>
 
-        <div className="profile-name">
-          {userData.name}
-        </div>
+        {/* Имя — только для просмотра, не редактируется */}
+        <div className="student-profile-name">{userData.name}</div>
 
-        <div className="profile-bio-container">
-          {isEditingBio ? (
-            <div className="profile-bio-edit">
+        <div className="student-profile-bio-container">
+          {isEditing ? (
+            <div className="student-profile-bio-edit">
               <textarea
                 value={tempBio}
                 onChange={(e) => setTempBio(e.target.value)}
                 rows={3}
                 placeholder="Расскажите о себе..."
               />
-              <button onClick={saveBio} className="save-bio-btn">Сохранить</button>
+              <button className="save-bio-btn" onClick={handleSave}>Сохранить</button>
             </div>
           ) : (
-            <div className="profile-bio" onClick={() => setIsEditingBio(true)}>
+            <div className="student-profile-bio" onClick={() => setIsEditing(true)}>
               {userData.bio || 'Добавьте описание профиля...'}
               <EditIcon />
             </div>
           )}
         </div>
-      </div>
 
-      <div className="profile-buttons">
-        <button className="profile-action-btn" onClick={onChangePassword}>
-          Смена пароля
-        </button>
+        <div className="student-profile-buttons">
+          <button className="student-profile-action-btn" onClick={onChangePassword}>
+            Сменить пароль
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-export default ProfileScreen;
+export default StudentProfile;
