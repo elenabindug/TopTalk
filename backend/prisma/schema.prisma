@@ -12,11 +12,12 @@ model User {
   email     String   @unique
   name      String
   password  String
-  role      String   @default("student") // student, teacher, admin
+  role      String   @default("student")
+  avatar    String?  // добавляем поле avatar
   createdAt DateTime @default(now())
   messages  Message[]
   chats     Chat[]   @relation("UserChats")
-  announcements Announcement[] // обратная связь для объявлений
+  announcements Announcement[]
 }
 
 model Chat {
@@ -40,8 +41,9 @@ model Message {
 
 model Announcement {
   id        String   @id @default(cuid())
+  title     String?
   text      String
-  groupId   String?   // null = для всех
+  groupId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   authorId  String

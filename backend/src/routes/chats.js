@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // GET /api/chats — список чатов пользователя
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    console.log(`GET /chats для userId: ${req.userId}`); // для отладки
+    console.log(`GET /chats для userId: ${req.userId}`);
     const chats = await prisma.chat.findMany({
       where: { users: { some: { id: req.userId } } },
       include: {
@@ -16,11 +16,10 @@ router.get('/', authMiddleware, async (req, res) => {
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
     });
-    // Всегда возвращаем массив (даже пустой)
     res.json(chats || []);
   } catch (err) {
     console.error('Ошибка в GET /chats:', err);
-    res.status(500).json({ error: 'Ошибка загрузки чатов' });
+    res.status(500).json({ error: 'Ошибка загрузки чатов', details: err.message });
   }
 });
 
@@ -41,7 +40,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     res.json(chat);
   } catch (err) {
     console.error('Ошибка в GET /chats/:id:', err);
-    res.status(500).json({ error: 'Ошибка загрузки чата' });
+    res.status(500).json({ error: 'Ошибка загрузки чата', details: err.message });
   }
 });
 
@@ -49,25 +48,55 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const { name, isGroup, userIds } = req.body;
-    // Защита: userIds должен быть массивом
+    
+    console.log('Создание чата:', { name, isGroup, userIds, currentUser: req.userId });
+    
+    // Для личного чата - проверяем существующий
+    if (!isGroup && userIds && userIds.length === 1) {
+      const otherUserId = userIds[0];
+      
+      // Ищем существующий личный чат
+      const existingChat = await prisma.chat.findFirst({
+        where: {
+          isGroup: false,
+          AND: [
+            { users: { some: { id: req.userId } } },
+            { users: { some: { id: otherUserId } } }
+          ]
+        },
+        include: {
+          users: { select: { id: true, name: true, email: true } },
+        },
+      });
+      
+      if (existingChat) {
+        console.log('Существующий чат найден:', existingChat.id);
+        return res.json(existingChat);
+      }
+    }
+    
+    // Создаем новый чат
     const membersIds = Array.isArray(userIds) ? userIds : [];
-    // Для личного чата можно автоматически сгенерировать имя
-    const chatName = isGroup ? name : null;
-
+    const allMemberIds = [req.userId, ...membersIds];
+    
     const chat = await prisma.chat.create({
       data: {
-        name: chatName,
+        name: isGroup ? name : null,
         isGroup: isGroup || false,
         users: {
-          connect: [{ id: req.userId }, ...membersIds.map(id => ({ id }))],
+          connect: allMemberIds.map(id => ({ id })),
         },
       },
-      include: { users: true },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+      },
     });
+    
+    console.log('Новый чат создан:', chat.id);
     res.json(chat);
   } catch (err) {
     console.error('Ошибка в POST /chats:', err);
-    res.status(500).json({ error: 'Ошибка создания чата' });
+    res.status(500).json({ error: 'Ошибка создания чата', details: err.message });
   }
 });
 
@@ -78,11 +107,12 @@ router.post('/:id/members', authMiddleware, async (req, res) => {
     const chat = await prisma.chat.update({
       where: { id: req.params.id },
       data: { users: { connect: { id: userId } } },
+      include: { users: { select: { id: true, name: true, email: true } } },
     });
     res.json(chat);
   } catch (err) {
     console.error('Ошибка добавления участника:', err);
-    res.status(500).json({ error: 'Ошибка добавления участника' });
+    res.status(500).json({ error: 'Ошибка добавления участника', details: err.message });
   }
 });
 
@@ -92,11 +122,12 @@ router.delete('/:id/members/:userId', authMiddleware, async (req, res) => {
     const chat = await prisma.chat.update({
       where: { id: req.params.id },
       data: { users: { disconnect: { id: req.params.userId } } },
+      include: { users: { select: { id: true, name: true, email: true } } },
     });
     res.json(chat);
   } catch (err) {
     console.error('Ошибка удаления участника:', err);
-    res.status(500).json({ error: 'Ошибка удаления участника' });
+    res.status(500).json({ error: 'Ошибка удаления участника', details: err.message });
   }
 });
 
