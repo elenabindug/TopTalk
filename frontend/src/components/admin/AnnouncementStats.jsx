@@ -62,13 +62,13 @@ function AnnouncementStats({ post, onBack }) {
             className={`stats-tab ${activeTab === 'views' ? 'active' : ''}`}
             onClick={() => setActiveTab('views')}
           >
-            👁️ Просмотры ({post.views || 0})
+             Просмотры ({post.views || 0})
           </button>
           <button 
             className={`stats-tab ${activeTab === 'reactions' ? 'active' : ''}`}
             onClick={() => setActiveTab('reactions')}
           >
-            👍 Реакции ({post.reactions?.length || 0})
+             Реакции ({post.reactions?.length || 0})
           </button>
         </div>
 
@@ -77,7 +77,7 @@ function AnnouncementStats({ post, onBack }) {
             {post.viewers && post.viewers.length > 0 ? (
               post.viewers.map((viewer, index) => (
                 <div key={index} className="stats-viewer">
-                  <div className="stats-viewer-avatar">👤</div>
+                  <div className="stats-viewer-avatar"></div>
                   <div className="stats-viewer-info">
                     <div className="stats-viewer-name">{viewer.name}</div>
                     <div className="stats-viewer-time">{formatDateTime(viewer.time)}</div>
@@ -86,7 +86,7 @@ function AnnouncementStats({ post, onBack }) {
               ))
             ) : (
               <div className="stats-empty">
-                <span className="stats-empty-icon">👁️</span>
+                <span className="stats-empty-icon"></span>
                 <p>Нет просмотров</p>
               </div>
             )}
@@ -119,7 +119,7 @@ function AnnouncementStats({ post, onBack }) {
               </>
             ) : (
               <div className="stats-empty">
-                <span className="stats-empty-icon">👍</span>
+                <span className="stats-empty-icon"></span>
                 <p>Нет реакций</p>
               </div>
             )}

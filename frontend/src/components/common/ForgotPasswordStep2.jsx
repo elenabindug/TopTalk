@@ -1,13 +1,17 @@
 import { useState } from 'react';
+import api from '../../api/axios';
 
-function ForgotPasswordStep2({ onBack, onComplete }) {
+function ForgotPasswordStep2({ onBack, onComplete, email }) {
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     
     if (code.length !== 6 || !/^\d+$/.test(code)) {
       alert('Код должен состоять из 6 цифр');
@@ -24,16 +28,29 @@ function ForgotPasswordStep2({ onBack, onComplete }) {
       return;
     }
     
-    console.log('Код:', code);
-    console.log('Новый пароль:', newPassword);
+    setLoading(true);
     
-    setIsSuccess(true);
-    
-    setTimeout(() => {
-      if (onComplete) {
-        onComplete();
-      }
-    }, 2000);
+    try {
+      const response = await api.post('/auth/reset-password', {
+        email: email,
+        code: code,
+        newPassword: newPassword
+      });
+      
+      console.log('Пароль изменён:', response.data);
+      setIsSuccess(true);
+      
+      setTimeout(() => {
+        if (onComplete) {
+          onComplete();
+        }
+      }, 2000);
+    } catch (error) {
+      console.error('Ошибка:', error);
+      setError(error.response?.data?.error || 'Ошибка при смене пароля');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isSuccess) {
@@ -66,6 +83,8 @@ function ForgotPasswordStep2({ onBack, onComplete }) {
           <p style={{ fontSize: '14px', color: '#6b6b6b', marginBottom: '10px', textAlign: 'center' }}>
             Введите код из письма и новый пароль
           </p>
+          
+          {error && <div className="error-message" style={{ color: '#dc2626', textAlign: 'center', fontSize: '14px', marginBottom: '10px' }}>{error}</div>}
           
           <div className="input-group" style={{ marginBottom: '5px' }}>
             <label>Код подтверждения</label>
@@ -101,7 +120,14 @@ function ForgotPasswordStep2({ onBack, onComplete }) {
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ marginTop: '10px' }}>Сменить пароль</button>
+          <button 
+            type="submit" 
+            className="btn-primary" 
+            style={{ marginTop: '10px' }}
+            disabled={loading}
+          >
+            {loading ? 'Отправка...' : 'Сменить пароль'}
+          </button>
           <button type="button" className="btn-link" onClick={onBack} style={{ fontSize: '16px', marginTop: '5px' }}>Назад</button>
         </form>
       </div>

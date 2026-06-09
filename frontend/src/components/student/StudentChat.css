@@ -1355,3 +1355,606 @@
   background: #4C4C50;
   transform: translateY(-1px);
 }
+
+/* Карандашик для аватарки */
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: #5F2DBB;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.profile-avatar-edit:hover {
+  background: #4a1f96;
+  transform: scale(1.05);
+}
+
+.profile-avatar-edit svg {
+  stroke: #ffffff;
+}
+
+/* Кнопка смены пароля — пожирнее */
+.profile-change-password-btn {
+  width: 100%;
+  padding: 12px;
+  background: #3C3C40;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.profile-change-password-btn:hover {
+  background: #4C4C50;
+  transform: translateY(-1px);
+}
+
+/* Обёртка для аватарки и карандашика рядом */
+.profile-avatar-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5F2DBB, #4a1f96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  font-size: 40px;
+  color: white;
+}
+
+/* Карандашик рядышком */
+.profile-avatar-edit-btn {
+  background: #5F2DBB;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.profile-avatar-edit-btn:hover {
+  background: #4a1f96;
+  transform: scale(1.05);
+}
+
+.profile-avatar-edit-btn svg {
+  stroke: #ffffff;
+}
+
+/* Кнопка смены пароля — пожирнее */
+.profile-change-password-btn {
+  width: 100%;
+  padding: 12px;
+  background: #3C3C40;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.profile-change-password-btn:hover {
+  background: #4C4C50;
+  transform: translateY(-1px);
+}
+
+/* Контейнер для аватарки с карандашиком */
+.profile-avatar-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5F2DBB, #4a1f96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  font-size: 40px;
+  color: white;
+}
+
+/* Карандашик на аватарке (внизу справа) */
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 35%;
+  transform: translateX(50%);
+  background: #5F2DBB;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar-edit:hover {
+  background: #4a1f96;
+  transform: translateX(50%) scale(1.05);
+}
+
+.profile-avatar-edit svg {
+  stroke: #ffffff;
+}
+
+/* Кнопка смены пароля — пожирнее */
+.profile-change-password-btn {
+  width: 100%;
+  padding: 12px;
+  background: #3C3C40;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.profile-change-password-btn:hover {
+  background: #4C4C50;
+  transform: translateY(-1px);
+}
+
+/* ========== КНОПКА-БУРГЕР (3 ПОЛОСКИ) ========== */
+.menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.menu-btn svg {
+  stroke: #686868 !important;
+  width: 24px;
+  height: 24px;
+}
+
+.menu-btn:hover {
+  background-color: #2C2C30;
+  border-radius: 47px;
+}
+
+.menu-btn:hover svg {
+  stroke: #ffffff !important;
+}
+
+/* ========== СООБЩЕНИЯ С АВАТАРКАМИ ========== */
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.message-wrapper.message-mine {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.message-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-avatar span {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.message-avatar-mine {
+  cursor: default;
+}
+
+.message-avatar-mine:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.message-bubble-wrapper {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-mine .message-bubble-wrapper {
+  align-items: flex-end;
+}
+
+.message-sender-name {
+  font-size: 11px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+  margin-left: 8px;
+}
+
+.message-mine .message-sender-name {
+  display: none;
+}
+
+.message-bubble {
+  padding: 10px 16px;
+  border-radius: 20px;
+  word-wrap: break-word;
+}
+
+.message-other .message-bubble {
+  background-color: #292929;
+  border-bottom-left-radius: 4px;
+}
+
+.message-mine .message-bubble {
+  background-color: #260369;
+  border-bottom-right-radius: 4px;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.message-time {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+  .message-avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .message-avatar span {
+    font-size: 12px;
+  }
+  
+  .message-bubble-wrapper {
+    max-width: 85%;
+  }
+  
+  .message-bubble {
+    padding: 8px 12px;
+  }
+  
+  .message-text {
+    font-size: 13px;
+  }
+}
+
+/* ========== СООБЩЕНИЯ С АВАТАРКАМИ ========== */
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  max-width: 100%;
+}
+
+.message-wrapper.message-mine {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.message-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-avatar span {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.message-avatar-mine {
+  cursor: default;
+}
+
+.message-avatar-mine:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.message-bubble-wrapper {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-mine .message-bubble-wrapper {
+  align-items: flex-end;
+}
+
+.message-sender-name {
+  font-size: 11px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+  margin-left: 8px;
+}
+
+.message-mine .message-sender-name {
+  display: none;
+}
+
+.message-bubble {
+  padding: 10px 16px;
+  border-radius: 20px;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 100%;
+}
+
+.message-other .message-bubble {
+  background-color: #292929;
+  border-bottom-left-radius: 4px;
+}
+
+.message-mine .message-bubble {
+  background-color: #260369;
+  border-bottom-right-radius: 4px;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ffffff;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.message-time {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Для длинных сообщений без пробелов (ссылки, длинные слова) */
+.message-text {
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+  .message-avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .message-avatar span {
+    font-size: 12px;
+  }
+  
+  .message-bubble-wrapper {
+    max-width: 85%;
+  }
+  
+  .message-bubble {
+    padding: 8px 12px;
+  }
+  
+  .message-text {
+    font-size: 13px;
+  }
+}
+
+/* ========== СООБЩЕНИЯ ========== */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Обертка для каждого сообщения */
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+/* СВОИ сообщения - справа */
+.message-wrapper.message-mine {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+/* ЧУЖИЕ сообщения - слева */
+.message-wrapper.message-other {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+/* Аватарка */
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.message-avatar span {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.message-avatar-mine {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.message-avatar:hover:not(.message-avatar-mine) {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Контейнер с текстом */
+.message-bubble-wrapper {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* СВОИ сообщения - выравниваем текст справа */
+.message-mine .message-bubble-wrapper {
+  align-items: flex-end;
+}
+
+/* ЧУЖИЕ сообщения - выравниваем текст слева */
+.message-other .message-bubble-wrapper {
+  align-items: flex-start;
+}
+
+/* Имя отправителя (только для чужих) */
+.message-sender-name {
+  font-size: 11px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+}
+
+.message-other .message-sender-name {
+  margin-left: 8px;
+}
+
+.message-mine .message-sender-name {
+  display: none;
+}
+
+/* Само сообщение */
+.message-bubble {
+  padding: 10px 16px;
+  border-radius: 20px;
+  word-wrap: break-word;
+}
+
+/* ЧУЖИЕ сообщения - серые */
+.message-other .message-bubble {
+  background-color: #292929;
+  border-bottom-left-radius: 4px;
+}
+
+/* СВОИ сообщения - фиолетовые */
+.message-mine .message-bubble {
+  background-color: #260369;
+  border-bottom-right-radius: 4px;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.message-time {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  text-align: right;
+}

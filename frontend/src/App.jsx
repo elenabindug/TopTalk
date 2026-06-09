@@ -17,9 +17,10 @@ function App() {
   const [forgotPasswordStep, setForgotPasswordStep] = useState(null);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [changeEmail, setChangeEmail] = useState('');
 
   // Проверка токена при загрузке
   useEffect(() => {
@@ -60,12 +61,14 @@ function App() {
     setView('login');
     setLogin('');
     setPassword('');
-    setEmail('');
     setForgotPasswordStep(null);
   };
 
   const handleChangePasswordStart = () => setChangePasswordStep('step1');
-  const handleEmailSent = () => setChangePasswordStep('step2');
+  const handleChangeEmailSent = (email) => {
+    setChangeEmail(email);
+    setChangePasswordStep('step2');
+  };
   const handleChangePasswordComplete = () => {
     setChangePasswordStep(null);
     alert('Пароль успешно изменён!');
@@ -73,7 +76,10 @@ function App() {
   const handleBackFromChangePassword = () => setChangePasswordStep(null);
 
   const handleForgotPasswordStart = () => setForgotPasswordStep('step1');
-  const handleForgotPasswordEmailSent = () => setForgotPasswordStep('step2');
+  const handleForgotPasswordEmailSent = (email) => {
+    setForgotEmail(email);
+    setForgotPasswordStep('step2');
+  };
   const handleForgotPasswordComplete = () => {
     setForgotPasswordStep(null);
     setView('login');
@@ -97,13 +103,14 @@ function App() {
     return <ChangePasswordStep1 
       onBack={handleBackFromChangePassword}
       onLogout={handleLogout}
-      onEmailSent={handleEmailSent}
+      onEmailSent={handleChangeEmailSent}
     />;
   }
   if (isAuthenticated && changePasswordStep === 'step2') {
     return <ChangePasswordStep2 
       onBack={() => setChangePasswordStep('step1')}
       onComplete={handleChangePasswordComplete}
+      email={changeEmail}
     />;
   }
 
@@ -118,6 +125,7 @@ function App() {
     return <ForgotPasswordStep2 
       onBack={() => setForgotPasswordStep('step1')}
       onComplete={handleForgotPasswordComplete}
+      email={forgotEmail}
     />;
   }
 

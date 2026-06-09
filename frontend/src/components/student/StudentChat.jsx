@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import StudentAnnouncements from './StudentAnnouncements';
 import ChangePasswordStep1 from '../common/ChangePasswordStep1';
 import ChangePasswordStep2 from '../common/ChangePasswordStep2';
+import api from '../../api/axios';
+import useSocket from '../../hooks/useSocket';
 import './StudentChat.css';
 
 // Иконки SVG
@@ -21,7 +23,6 @@ const LogoutIcon = () => (
   </svg>
 );
 
-// Иконки для меню
 const ProfileIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -36,7 +37,6 @@ const AnnouncementIcon = () => (
   </svg>
 );
 
-// Иконки для смайлика и скрепки
 const SmileIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="12" cy="12" r="10"/>
@@ -52,8 +52,14 @@ const AttachIcon = () => (
   </svg>
 );
 
+const EditIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
+    <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
+    <path d="M4 20h16"/>
+  </svg>
+);
+
 function StudentChat({ onLogout }) {
-  // ========== ВСЕ ХУКИ В НАЧАЛЕ ==========
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -63,66 +69,106 @@ function StudentChat({ onLogout }) {
   const [messages, setMessages] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState('');
+  
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('token');
+  const socket = useSocket(token);
+  
   const [userData, setUserData] = useState({
-    name: 'Студент',
-    bio: 'Люблю программирование и дизайн',
-    avatar: ''
+    name: user.name || 'Студент',
+    bio: user.bio || 'Люблю программирование и дизайн',
+    avatar: user.avatar || ''
   });
-  const [chats] = useState([
-    { 
-      id: 1, 
-      name: "Общий чат", 
-      lastMessage: "Привет всем!", 
-      time: "12:30",
-      online: 5,
-      isGroup: true
-    },
-    { 
-      id: 2, 
-      name: "С Леной", 
-      lastMessage: "Как дела?", 
-      time: "11:45",
-      isOnline: true,
-      isGroup: false
-    },
-    { 
-      id: 3, 
-      name: "С Преподавателем", 
-      lastMessage: "Когда сдавать проект?", 
-      time: "вчера",
-      isOnline: false,
-      lastSeen: "вчера в 15:30",
-      isGroup: false
-    }
-  ]);
 
   const menuRef = useRef(null);
   const menuBtnRef = useRef(null);
 
-  // ========== ВСЕ useEffect И ФУНКЦИИ ==========
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const response = await api.get('/chats');
+        setChats(response.data);
+      } catch (error) {
+        console.error('Ошибка загрузки чатов:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChats();
+  }, []);
+
+  useEffect(() => {
+    if (!activeChatId) return;
+    
+    const fetchMessages = async () => {
+      try {
+        const response = await api.get(`/messages/${activeChatId}`);
+        setMessages(response.data);
+      } catch (error) {
+        console.error('Ошибка загрузки сообщений:', error);
+      }
+    };
+    fetchMessages();
+  }, [activeChatId]);
+
+  useEffect(() => {
+    if (!socket || !activeChatId) return;
+    
+    socket.emit('join-chat', activeChatId);
+    
+    const handleNewMessage = (message) => {
+      if (message.chatId === activeChatId) {
+        setMessages(prev => [...prev, message]);
+      }
+    };
+    
+    socket.on('new-message', handleNewMessage);
+    
+    return () => {
+      socket.off('new-message', handleNewMessage);
+    };
+  }, [socket, activeChatId]);
+
+  const sendMessages = async () => {
+    const trimmedText = inputText.trim();
+    if (trimmedText === "") return;
+    if (!activeChatId) {
+      alert('Выберите чат');
+      return;
+    }
+
+    try {
+      const response = await api.post('/messages', {
+        chatId: activeChatId,
+        text: trimmedText
+      });
+      setMessages(prev => [...prev, response.data]);
+      setInputText('');
+      
+      const chatResponse = await api.get(`/chats/${activeChatId}`);
+      setChats(prev => prev.map(c => c.id === activeChatId ? chatResponse.data : c));
+    } catch (error) {
+      console.error('Ошибка отправки:', error);
+      alert('Не удалось отправить сообщение');
+    }
+  };
+
   const addEmoji = (emoji) => {
     setInputText(prev => prev + emoji);
     setShowEmojiPicker(false);
   };
 
-  const handleChangePasswordStart = () => {
-    setChangePasswordStep('step1');
-  };
-
-  const handleEmailSent = () => {
-    setChangePasswordStep('step2');
-  };
-
+  const handleChangePasswordStart = () => setChangePasswordStep('step1');
+  const handleEmailSent = () => setChangePasswordStep('step2');
   const handleChangePasswordComplete = () => {
     setChangePasswordStep(null);
     alert('Пароль успешно изменён!');
   };
-
-  const handleBackFromChangePassword = () => {
-    setChangePasswordStep(null);
-  };
+  const handleBackFromChangePassword = () => setChangePasswordStep(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -141,57 +187,8 @@ function StudentChat({ onLogout }) {
     };
   }, [isMenuOpen]);
 
-  useEffect(() => {
-    const savedMessages = localStorage.getItem('studentMessages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    } else {
-      const testMessages = [
-        {
-          id: 1,
-          text: 'Добро пожаловать в общий чат!',
-          senderId: 1,
-          senderName: 'Администратор',
-          chatId: 1,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          date: new Date().toISOString()
-        }
-      ];
-      setMessages(testMessages);
-      localStorage.setItem('studentMessages', JSON.stringify(testMessages));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('studentMessages', JSON.stringify(messages));
-    }
-  }, [messages]);
-
-  const sendMessages = () => {
-    const trimmedText = inputText.trim();
-    if (trimmedText === "") return;
-    if (!activeChatId) {
-      alert('Выберите чат');
-      return;
-    }
-
-    const newMessage = {
-      id: Date.now(),
-      text: trimmedText,
-      senderId: 2,
-      senderName: 'Студент',
-      chatId: activeChatId,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      date: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setInputText('');
-  };
-
   const filteredChats = chats.filter(chat =>
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    chat.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const filteredMessages = messages.filter(msg => msg.chatId === activeChatId);
   const activeChat = chats.find(c => c.id === activeChatId);
@@ -199,29 +196,13 @@ function StudentChat({ onLogout }) {
   const getHeaderStatus = () => {
     if (!activeChat) return '';
     if (activeChat.isGroup) {
-      return `${activeChat.online} в сети`;
+      return `${activeChat.users?.length || 0} участников`;
     } else {
-      if (activeChat.isOnline) {
-        return 'в сети';
-      } else {
-        return `был(а) ${activeChat.lastSeen}`;
-      }
+      const otherUser = activeChat.users?.find(u => u.id !== user.id);
+      return otherUser?.name || 'Пользователь';
     }
   };
 
-  const getChatStatus = (chat) => {
-    if (chat.isGroup) {
-      return <div className="chat-status online-count">{chat.online} в сети</div>;
-    } else {
-      if (chat.isOnline) {
-        return <div className="chat-status online">в сети</div>;
-      } else {
-        return <div className="chat-status offline">{chat.lastSeen}</div>;
-      }
-    }
-  };
-
-  // ========== РАННИЕ RETURN ==========
   if (changePasswordStep === 'step1') {
     return <ChangePasswordStep1 
       onBack={handleBackFromChangePassword}
@@ -241,7 +222,10 @@ function StudentChat({ onLogout }) {
     return <StudentAnnouncements onBack={() => setShowAnnouncements(false)} />;
   }
 
-  // ========== ОСНОВНОЙ RETURN ==========
+  if (loading) {
+    return <div className="loading">Загрузка...</div>;
+  }
+
   return (
     <div className="student-chat-container">
       <div className="student-chat-sidebar">
@@ -274,14 +258,17 @@ function StudentChat({ onLogout }) {
             >
               <div className="chat-avatar"></div>
               <div className="chat-info">
-                <div className="chat-name">{chat.name}</div>
-                {chat.lastMessage && (
-                  <div className="chat-last-message">{chat.lastMessage}</div>
+                <div className="chat-name">{chat.name || (chat.users?.find(u => u.id !== user.id)?.name || 'Чат')}</div>
+                {chat.messages?.[0] && (
+                  <div className="chat-last-message">{chat.messages[0].text}</div>
                 )}
               </div>
               <div className="chat-right">
-                <div className="chat-time">{chat.time}</div>
-                {getChatStatus(chat)}
+                {chat.messages?.[0] && (
+                  <div className="chat-time">
+                    {new Date(chat.messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -295,7 +282,7 @@ function StudentChat({ onLogout }) {
             <div className="floating-menu-header">
               <div className="user-avatar"></div>
               <div className="user-info">
-                <span className="user-nickname">Студент</span>
+                <span className="user-nickname">{user.name || 'Студент'}</span>
                 <span className="student-badge">Student</span>
               </div>
             </div>
@@ -317,68 +304,41 @@ function StudentChat({ onLogout }) {
         </>
       )}
 
-      {/* Модальное окно профиля */}
       {showProfileModal && (
         <div className="profile-modal-overlay" onClick={() => setShowProfileModal(false)}>
           <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
             <div className="profile-modal-header">
               <h2>Профиль студента</h2>
-              <button className="profile-modal-close" onClick={() => setShowProfileModal(false)}>
-                ✕
-              </button>
+              <button className="profile-modal-close" onClick={() => setShowProfileModal(false)}>✕</button>
             </div>
-
             <div className="profile-modal-body">
               <div className="profile-avatar-container">
-                <div 
-                  className="profile-avatar" 
-                  onClick={() => {
-                    const newAvatar = prompt('Введите URL новой аватарки:', userData.avatar);
-                    if (newAvatar !== null) setUserData({...userData, avatar: newAvatar});
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
+                <div className="profile-avatar">
                   {!userData.avatar && <span className="avatar-placeholder">{userData.name?.[0] || 'С'}</span>}
                 </div>
+                {isEditing && (
+                  <button className="profile-avatar-edit" onClick={() => {
+                    const newAvatar = prompt('Введите URL новой аватарки:', userData.avatar);
+                    if (newAvatar !== null) setUserData({...userData, avatar: newAvatar});
+                  }}>
+                    <EditIcon />
+                  </button>
+                )}
               </div>
-
               <div className="profile-name">{userData.name}</div>
-
               {isEditing ? (
                 <>
-                  <textarea
-                    className="profile-bio-edit-input"
-                    value={tempBio}
-                    onChange={(e) => setTempBio(e.target.value)}
-                    rows={3}
-                    placeholder="Расскажите о себе..."
-                  />
-                  <button className="profile-save-btn" onClick={() => {
-                    setUserData({...userData, bio: tempBio});
-                    setIsEditing(false);
-                  }}>
-                    Сохранить
-                  </button>
+                  <textarea className="profile-bio-edit-input" value={tempBio} onChange={(e) => setTempBio(e.target.value)} rows={3} placeholder="Расскажите о себе..." />
+                  <button className="profile-save-btn" onClick={() => { setUserData({...userData, bio: tempBio}); setIsEditing(false); }}>Сохранить</button>
                 </>
               ) : (
                 <>
                   <div className="profile-bio-text">{userData.bio || 'Добавьте описание профиля...'}</div>
-                  <button className="profile-edit-btn" onClick={() => {
-                    setTempBio(userData.bio);
-                    setIsEditing(true);
-                  }}>
-                    Редактировать профиль
-                  </button>
+                  <button className="profile-edit-btn" onClick={() => { setTempBio(userData.bio); setIsEditing(true); }}>Редактировать профиль</button>
                 </>
               )}
-
               {isEditing && (
-                <button className="profile-change-password-btn" onClick={() => {
-                  setShowProfileModal(false);
-                  handleChangePasswordStart();
-                }}>
-                  Сменить пароль
-                </button>
+                <button className="profile-change-password-btn" onClick={() => { setShowProfileModal(false); handleChangePasswordStart(); }}>Сменить пароль</button>
               )}
             </div>
           </div>
@@ -388,57 +348,90 @@ function StudentChat({ onLogout }) {
       <main className="student-chat-main">
         {!activeChatId ? (
           <div className="chat-placeholder">
-            <div className="placeholder-card">
-              Выберите, кому хотели бы написать
-            </div>
+            <div className="placeholder-card">Выберите, кому хотели бы написать</div>
           </div>
         ) : (
           <>
             <div className="chat-header">
               <div className="chat-header-top">
-                <h2>{activeChat?.name}</h2>
-                <div className="chat-header-status">
-                  {getHeaderStatus()}
-                </div>
+                <h2>{activeChat.name || (activeChat.users?.find(u => u.id !== user.id)?.name || 'Чат')}</h2>
+                <div className="chat-header-status">{getHeaderStatus()}</div>
               </div>
             </div>
             <div className="chat-messages">
               {filteredMessages.length === 0 ? (
                 <div className="no-messages-card">
-                  <div className="no-messages-placeholder">
-                    Нет сообщений. Напишите первое сообщение!
-                  </div>
+                  <div className="no-messages-placeholder">Нет сообщений. Напишите первое сообщение!</div>
                 </div>
               ) : (
-                filteredMessages.map(msg => (
-                  <div key={msg.id} className={`message ${msg.senderId === 2 ? 'message-mine' : 'message-other'}`}>
-                    <div className="message-bubble">
-                      <div className="message-text">{msg.text}</div>
-                      <div className="message-time">{msg.time}</div>
+                filteredMessages.map(msg => {
+                  const isMine = msg.userId === user.id;
+                  const sender = activeChat?.users?.find(u => u.id === msg.userId);
+                  
+                  return (
+                    <div key={msg.id} className={`message-wrapper ${isMine ? 'message-mine' : 'message-other'}`}>
+                      {!isMine && (
+                        <div 
+                          className="message-avatar" 
+                          onClick={() => {
+                            const existingChat = chats.find(chat => 
+                              !chat.isGroup && 
+                              chat.users?.some(u => u.id === sender?.id) &&
+                              chat.users?.some(u => u.id === user.id)
+                            );
+                            
+                            if (existingChat) {
+                              setActiveChatId(existingChat.id);
+                            } else if (sender?.id) {
+                              api.post('/chats', {
+                                userIds: [user.id, sender.id],
+                                isGroup: false
+                              }).then(response => {
+                                setChats(prev => [...prev, response.data]);
+                                setActiveChatId(response.data.id);
+                              }).catch(err => {
+                                console.error('Ошибка создания чата:', err);
+                                alert('Не удалось создать чат');
+                              });
+                            }
+                          }}
+                          title={`Написать ${sender?.name || 'пользователю'}`}
+                        >
+                          {sender?.avatar ? (
+                            <img src={sender.avatar} alt={sender.name} />
+                          ) : (
+                            <span>{sender?.name?.[0] || '?'}</span>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="message-bubble-wrapper">
+                        {!isMine && <div className="message-sender-name">{sender?.name}</div>}
+                        <div className="message-bubble">
+                          <div className="message-text">{msg.text}</div>
+                          <div className="message-time">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                      </div>
+                      
+                      {isMine && (
+                        <div className="message-avatar message-avatar-mine">
+                          {user.avatar ? (
+                            <img src={user.avatar} alt={user.name} />
+                          ) : (
+                            <span>{user.name?.[0] || 'Я'}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             <div className="chat-input-container">
-              <button className="emoji-btn" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-                <SmileIcon />
-              </button>
-              <label className="file-btn">
-                <AttachIcon />
-                <input type="file" hidden />
-              </label>
-              <input
-                type="text"
-                className="chat-input"
-                placeholder="Введите сообщение..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessages()}
-              />
-              <button className="send-btn" onClick={sendMessages}>
-                Отправить
-              </button>
+              <button className="emoji-btn" onClick={() => setShowEmojiPicker(!showEmojiPicker)}><SmileIcon /></button>
+              <label className="file-btn"><AttachIcon /><input type="file" hidden /></label>
+              <input type="text" className="chat-input" placeholder="Введите сообщение..." value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && sendMessages()} />
+              <button className="send-btn" onClick={sendMessages}>Отправить</button>
             </div>
             {showEmojiPicker && (
               <div className="emoji-picker">

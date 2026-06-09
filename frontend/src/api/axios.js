@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'http://localhost:5001/api', // или твой URL бэкенда
+  headers: { 'Content-Type': 'application/json' }
 });
 
-// добавляем токен в каждый запрос
+// Перехватчик для добавления токена
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
